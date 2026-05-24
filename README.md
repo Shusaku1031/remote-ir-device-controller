@@ -23,6 +23,53 @@ pigpio デーモンを起動しておく必要があります。
 sudo pigpiod
 ```
 
+### 配線
+
+#### 記録時（赤外線受信モジュール）
+
+```mermaid
+graph LR
+    subgraph Pi["Raspberry Pi"]
+        G4["GPIO (例: 4)"]
+        V33["3.3V / 5V"]
+        GND["GND"]
+    end
+
+    subgraph RX["赤外線受信モジュール"]
+        R_OUT["OUT"]
+        R_VCC["VCC"]
+        R_GND["GND"]
+    end
+
+    G4   --- R_OUT
+    V33  --- R_VCC
+    GND  --- R_GND
+```
+
+#### 発信時（赤外線送信モジュール）
+
+```mermaid
+graph LR
+    subgraph Pi["Raspberry Pi"]
+        G17["GPIO (例: 17)"]
+        V33["3.3V / 5V"]
+        GND["GND"]
+    end
+
+    subgraph TX["赤外線送信モジュール"]
+        T_IN["IN"]
+        T_VCC["VCC"]
+        T_GND["GND"]
+    end
+
+    G17  --- T_IN
+    V33  --- T_VCC
+    GND  --- T_GND
+```
+
+> GPIO ピン番号は `-g` オプション（必須）で指定します。上記の番号はコマンド例で使われている値であり、固定ではありません。
+> VCC の電圧は使用するモジュールの仕様に応じて 3.3V または 5V を選択してください。
+
 ### 使い方
 
 #### 
