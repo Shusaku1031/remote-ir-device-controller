@@ -119,3 +119,60 @@ graph LR
 |---|---|---|
 | `--freq` | 38 kHz | 赤外線キャリア周波数 |
 | `--gap` | 100 ms | 連続送信時のコード間の間隔 |
+
+### Tailscale を使った遠隔操作
+
+Tailscale を使うことで、同一ネットワーク外からでも Raspberry Pi に接続して信号を発信できます。
+
+#### 1. Raspberry Pi に Tailscale をインストール
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+```
+
+#### 2. Tailscale を起動して認証
+
+```bash
+sudo tailscale up
+```
+
+表示された URL をブラウザで開き、Tailscale アカウントでログインして認証します。
+
+#### 3. Tailscale IP アドレスを確認
+
+```bash
+tailscale ip
+```
+
+#### 4. pigpiod を自動起動に設定
+
+再起動後も pigpiod が自動で起動するよう systemd に登録します。
+
+```bash
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+```
+
+#### 5. 操作元マシンから SSH 経由で信号を発信
+
+操作元マシンも Tailscale に接続した上で、以下のように実行します。
+
+```bash
+ssh <user>@<tailscale-ip> "./irrp.py -p -g17 -fcodes key1"
+```
+
+`<user>` は Raspberry Pi のユーザー名、`<tailscale-ip>` は手順 3 で確認した IP アドレスです。
+
+#### Tailscale 接続の概要
+
+```mermaid
+graph LR
+    Client["操作元マシン\n（Tailscale 接続済み）"]
+    Tailnet["Tailscale ネットワーク"]
+    Pi["Raspberry Pi\n（Tailscale 接続済み）"]
+    Device["家電"]
+
+    Client -->|"SSH + irrp.py"| Tailnet
+    Tailnet --> Pi
+    Pi -->|"赤外線信号"| Device
+```
